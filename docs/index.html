@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FlowTower 物流塔台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<script src="config.js"></script>
+</head>
+<body>
+<aside id="nav">
+  <div class="logo"><i></i><div>FlowTower<small>物流塔台</small></div></div>
+  <nav>
+    <div class="grp">控制塔</div>
+    <a href="#tower" data-r="tower">🏢 像素控制塔 <span class="tag">即將</span></a>
+    <div class="grp">訂單與倉庫</div>
+    <a href="#oms" data-r="oms">🧾 OMS 訂單</a>
+    <a href="#wms" data-r="wms">📦 WMS 倉庫</a>
+    <div class="grp">運輸</div>
+    <a href="#tms" data-r="tms">🚚 TMS 調度 <span class="tag">即將</span></a>
+    <a href="#driver" data-r="driver">📱 司機 App <span class="tag">即將</span></a>
+    <a href="#exceptions" data-r="exceptions">⚠️ 異常／缺車 <span class="tag">即將</span></a>
+    <a href="#fleet" data-r="fleet">🚛 車輛資源 <span class="tag">即將</span></a>
+    <div class="grp">管理</div>
+    <a href="#projects" data-r="projects">📋 專案管理平台 <span class="tag">即將</span></a>
+  </nav>
+  <div class="foot">Demo 版 · 資料皆為虛構</div>
+</aside>
+<main id="main">
+  <header id="top"><button id="menuBtn">☰</button><div><h1 id="title">-</h1><div class="sub" id="sub"></div></div><div class="sp"></div><span class="demo">DEMO</span><div id="actions" class="row"></div></header>
+  <section id="view"><div class="loading">載入中…</div></section>
+</main>
+<div id="mask"></div>
+<div id="drawer"><div class="dh"><h2 id="dT"></h2><span id="dB"></span><button class="x" id="dX">×</button></div><div class="db" id="dBody"></div><div class="df" id="dFoot"></div></div>
+<div id="toast"></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
