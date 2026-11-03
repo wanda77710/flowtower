@@ -63,6 +63,7 @@ export async function render(ui) {
     else if (cur && !has(cur.order_id, 'arrive_gate')) next = ['arrive_gate', '📍 抵達哨口'];
     else if (cur && !has(cur.order_id, 'arrive_dock')) next = ['arrive_dock', '🏭 抵達碼頭'];
     else if (cur) next = ['delivered', '✅ 完成交貨'];
+    const sameN = cur ? stops.filter(s => s.orders.location_id === cur.orders.location_id && !has(s.order_id, 'delivered')).length : 0;
     const fab = cur && custOf(cur).is_fab && departed && has(cur.order_id, 'arrive_gate');
     db.insertAdjacentHTML('beforeend', `
       <div class="tcard"><div class="row"><b class="mono">${t.trip_no}</b><span class="mut" style="margin-left:auto">出車 ${fmtHM(t.planned_depart_at)}</span></div>
@@ -70,7 +71,7 @@ export async function render(ui) {
         <div class="mut" style="font-size:12px">${s.orders.order_no}・指定 ${fmtHM(s.orders.req_arrive_at)}・${d ? '已交貨' : has(s.order_id, 'arrive_dock') ? '已到碼頭' : has(s.order_id, 'arrive_gate') ? '已到哨口' : '未到'}</div></div>`; }).join('')}</div>
       ${!handed ? '<div class="tcard" style="text-align:center">⏳ 等待倉庫交車<br><span class="mut" style="font-size:12px">倉庫在 WMS 掃碼交車後就能出發</span></div>' : ''}
       ${fab ? `<div class="tcard" style="font-size:13px">📵 晶圓廠內不能用手機：出廠後再補登。<label class="f" style="margin-top:6px">實際時間<input type="time" id="bf" value="${new Date().toTimeString().slice(0, 5)}"></label></div>` : ''}
-      ${next ? `<button class="big" id="nx">${next[1]}${cur && next[0] !== 'depart' ? `<div style="font:400 12px 'Noto Sans TC';opacity:.85">${esc(M.loc[cur.orders.location_id]?.name)}</div>` : ''}</button>` : ''}
+      ${next ? `<button class="big" id="nx">${next[1]}${cur && next[0] !== 'depart' ? `<div style="font:400 12px 'Noto Sans TC';opacity:.85">${esc(M.loc[cur.orders.location_id]?.name)}${sameN > 1 ? `・${sameN} 張單一起回報` : ''}</div>` : ''}</button>` : ''}
       ${departed && cur ? '<button class="big alt" id="ex">⚠️ 回報異常</button>' : ''}
       ${!cur ? '<div class="tcard" style="text-align:center">🎉 這趟全部完成！</div>' : ''}`);
 
@@ -81,7 +82,8 @@ export async function render(ui) {
       const bf = db.querySelector('#bf');
       if (bf && ['arrive_dock', 'delivered'].includes(next[0])) { const [h, m] = bf.value.split(':'); at.setHours(+h, +m, 0, 0); }
       await ui.guard(async () => {
-        const targets = next[0] === 'depart' ? stops : [cur];
+        // 同一送達點的多張單一次回報（同廠多單）
+        const targets = next[0] === 'depart' ? stops : stops.filter(s => s.orders.location_id === cur.orders.location_id && !has(s.order_id, 'delivered') && !has(s.order_id, next[0]));
         await api.insert('tracking_events', targets.map(s => ({ trip_id: t.id, order_id: s.order_id, event: next[0], event_at: at.toISOString(), is_backfill: !!bf && ['arrive_dock', 'delivered'].includes(next[0]), lat: pos?.lat, lng: pos?.lng })));
         if (next[0] === 'depart') {
           await api.update('orders', `id=in.(${stops.map(s => s.order_id).join(',')})`, { status: 'in_transit' });
@@ -89,8 +91,8 @@ export async function render(ui) {
           await api.update('vehicles', `id=eq.${t.vehicle_id}`, { status: 'on_trip' });
         }
         if (next[0] === 'delivered') {
-          await api.update('orders', `id=eq.${cur.order_id}`, { status: 'delivered' });
-          if (stops.filter(s => s !== cur).every(s => has(s.order_id, 'delivered'))) {
+          await api.update('orders', `id=in.(${targets.map(s => s.order_id).join(',')})`, { status: 'delivered' });
+          if (stops.filter(s => !targets.includes(s)).every(s => has(s.order_id, 'delivered'))) {
             await api.update('trips', `id=eq.${t.id}`, { status: 'completed' });
             await api.update('vehicles', `id=eq.${t.vehicle_id}`, { status: 'idle' });
           }
