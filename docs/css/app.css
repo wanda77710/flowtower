@@ -44,6 +44,7 @@ label.f{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mu
 label.f>*{color:var(--ink);font-size:14px}
 table.t{width:100%;border-collapse:collapse;background:var(--card)}
 .t th{text-align:left;font-weight:500;color:var(--mut);font-size:12px;padding:9px 10px;border-bottom:1px solid var(--line);background:#fafbfc;position:sticky;top:0}
+.t th,.t td{white-space:nowrap}
 .t td{padding:9px 10px;border-bottom:1px solid #f0f1f4;vertical-align:middle}
 .t tr.click{cursor:pointer}.t tr.click:hover td{background:#f7fbfa}
 .tw{border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:calc(100vh - 260px)}

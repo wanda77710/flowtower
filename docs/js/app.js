@@ -1,4 +1,4 @@
-import { master } from './api.js';
+import { master, api } from './api.js';
 
 const $ = id => document.getElementById(id);
 export const ui = {
@@ -14,6 +14,15 @@ export const ui = {
   async guard(fn, okMsg) { try { const r = await fn(); if (okMsg) ui.toast(okMsg); return r; } catch (e) { console.error(e); ui.toast('操作失敗：' + e.message.slice(0, 120), true); throw e; } },
 };
 $('dX').onclick = ui.closeDrawer; $('mask').onclick = ui.closeDrawer;
+$('resetBtn').onclick = async () => {
+  if (!confirmBox()) return;
+  $('resetBtn').disabled = true; $('resetBtn').textContent = '重置中…';
+  try { await api.rpc('reset_demo'); await master(true); ui.toast('已用目前時間重新產生 Demo 資料'); route(); }
+  catch (e) { ui.toast('重置失敗：' + e.message.slice(0, 100), true); }
+  $('resetBtn').disabled = false; $('resetBtn').textContent = '↻ 重置 Demo 資料';
+};
+let armed = 0;
+function confirmBox() { if (Date.now() - armed < 4000) return true; armed = Date.now(); ui.toast('再按一次確認重置（所有人的操作都會清掉）'); return false; }
 $('menuBtn').onclick = () => $('nav').classList.toggle('open');
 
 const routes = {
