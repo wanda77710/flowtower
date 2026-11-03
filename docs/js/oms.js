@@ -151,8 +151,9 @@ function createForm(ui, M, reload) {
     const a = new Date(new Date($('#cD').value).getTime() + mins * 60000); $('#cA').value = toLocalInput(a);
     $('#cHint').textContent = std ? `依標準行車時間 ${std} 分鐘自動帶入` : '沒有這條路線的標準行車時間，先以 60 分鐘帶入'; };
   const addLine = () => { const tr = document.createElement('tr'); tr.innerHTML = `<td><select>${M.products.map(p => `<option value="${p.sku}">${esc(p.name)}</option>`).join('')}</select></td><td><input type="number" min="1" value="${1 + Math.floor(Math.random() * 10)}"></td><td><button class="btn sm">✕</button></td>`; tr.querySelector('button').onclick = () => tr.remove(); $('#cLines').appendChild(tr); };
-  $('#cC').onchange = fillLoc; $('#cS').onchange = eta; $('#cL').onchange = eta; $('#cD').onchange = eta; $('#addL').onclick = addLine;
-  fillLoc(); addLine();
+  const bestSite = () => { const std = M.loc[$('#cL').value]?.std_travel_min || {}; const best = Object.entries(std).sort((a, b) => a[1] - b[1])[0]; if (best) $('#cS').value = best[0]; eta(); };
+  $('#cC').onchange = () => { fillLoc(); bestSite(); }; $('#cS').onchange = eta; $('#cL').onchange = bestSite; $('#cD').onchange = eta; $('#addL').onclick = addLine;
+  fillLoc(); bestSite(); addLine();
   const save = async release => {
     const lines = [...$('#cLines').querySelectorAll('tr')].map(tr => ({ sku: tr.querySelector('select').value, qty: +tr.querySelector('input').value })).filter(l => l.qty > 0);
     if (!lines.length) return ui.toast('至少要一項貨品', true);
