@@ -70,9 +70,9 @@ cross join lateral (select date_trunc('minute', now() + make_interval(mins => -1
 cross join lateral (select * from locations where (std_travel_min ? s.id or random()<0.15) and k>0 order by random() limit 1) l;
 
 insert into order_lines(order_id,sku,qty,picked_qty)
-select o.id, p.sku, q, case when o.status in ('picked','loaded','in_transit','delivered') then q else 0 end
-from orders o cross join lateral (select sku from products where o.id is not null order by random() limit 1+floor(random()*3)::int) p
-cross join lateral (select 1+floor(random()*20)::int+length(p.sku)*0 q) qq;
+select order_id, sku, q, case when st in ('picked','loaded','in_transit','delivered') then q else 0 end
+from (select o.id order_id, o.status st, p.sku, (1+floor(random()*20))::int q
+      from orders o cross join lateral (select sku from products where o.id is not null order by random() limit 1+floor(random()*3)::int) p) x;
 
 insert into pick_tasks(order_id,site_id,picker,status,started_at,done_at)
 select id, site_id, '撿貨員'||(1+floor(random()*3)::int),
