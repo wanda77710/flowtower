@@ -25,11 +25,12 @@ let armed = 0;
 function confirmBox() { if (Date.now() - armed < 4000) return true; armed = Date.now(); ui.toast('再按一次確認重置（所有人的操作都會清掉）'); return false; }
 $('menuBtn').onclick = () => $('nav').classList.toggle('open');
 
+const V = new URL(import.meta.url).searchParams.get('v') || '1';
 const routes = {
-  oms: () => import('./oms.js'),
-  wms: () => import('./wms.js'),
-  tms: () => import('./tms.js'),
-  driver: () => import('./driver.js'),
+  oms: () => import('./oms.js?v=' + V),
+  wms: () => import('./wms.js?v=' + V),
+  tms: () => import('./tms.js?v=' + V),
+  driver: () => import('./driver.js?v=' + V),
 };
 const SOON = { tower: '像素控制塔', tms: 'TMS 調度', driver: '司機 App', exceptions: '異常／缺車', fleet: '車輛資源', projects: '專案管理平台' };
 
