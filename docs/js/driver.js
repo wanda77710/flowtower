@@ -70,17 +70,18 @@ export async function render(ui) {
       ${stops.map(s => { const d = has(s.order_id, 'delivered'); return `<div class="stop ${d ? 'done' : s === cur ? 'cur' : ''}"><b>${s.stop_seq}. ${esc(M.loc[s.orders.location_id]?.name)}</b>${custOf(s).is_fab ? ' <span class="badge">晶圓廠</span>' : ''}
         <div class="mut" style="font-size:12px">${s.orders.order_no}・指定 ${fmtHM(s.orders.req_arrive_at)}・${d ? '已交貨' : has(s.order_id, 'arrive_dock') ? '已到碼頭' : has(s.order_id, 'arrive_gate') ? '已到哨口' : '未到'}</div></div>`; }).join('')}</div>
       ${!handed ? '<div class="tcard" style="text-align:center">⏳ 等待倉庫交車<br><span class="mut" style="font-size:12px">倉庫在 WMS 掃碼交車後就能出發</span></div>' : ''}
-      ${fab ? `<div class="tcard" style="font-size:13px">📵 晶圓廠內不能用手機：出廠後再補登。<label class="f" style="margin-top:6px">實際時間<input type="time" id="bf" value="${new Date().toTimeString().slice(0, 5)}"></label></div>` : ''}
+      ${fab ? `<div class="tcard" style="font-size:13px">📵 晶圓廠內不能用手機：出廠後再補登。<label class="f" style="margin-top:6px">實際時間（不改＝現在）<input type="time" id="bf" value="${new Date().toTimeString().slice(0, 5)}"></label></div>` : ''}
       ${next ? `<button class="big" id="nx">${next[1]}${cur && next[0] !== 'depart' ? `<div style="font:400 12px 'Noto Sans TC';opacity:.85">${esc(M.loc[cur.orders.location_id]?.name)}${sameN > 1 ? `・${sameN} 張單一起回報` : ''}</div>` : ''}</button>` : ''}
       ${departed && cur ? '<button class="big alt" id="ex">⚠️ 回報異常</button>' : ''}
       ${!cur ? '<div class="tcard" style="text-align:center">🎉 這趟全部完成！</div>' : ''}`);
 
+    db.querySelector('#bf')?.addEventListener('input', e => { e.target.dataset.dirty = '1'; });
     db.querySelector('#nx')?.addEventListener('click', async e => {
       e.currentTarget.disabled = true;
       const pos = await gps();
       let at = new Date();
       const bf = db.querySelector('#bf');
-      if (bf && ['arrive_dock', 'delivered'].includes(next[0])) { const [h, m] = bf.value.split(':'); at.setHours(+h, +m, 0, 0); }
+      if (bf && bf.dataset.dirty && ['arrive_dock', 'delivered'].includes(next[0])) { const [h, m] = bf.value.split(':'); at.setHours(+h, +m, 0, 0); if (at > new Date()) at.setDate(at.getDate() - 1); }
       await ui.guard(async () => {
         // 同一送達點的多張單一次回報（同廠多單）
         const targets = next[0] === 'depart' ? stops : stops.filter(s => s.orders.location_id === cur.orders.location_id && !has(s.order_id, 'delivered') && !has(s.order_id, next[0]));
