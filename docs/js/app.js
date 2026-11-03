@@ -28,6 +28,8 @@ $('menuBtn').onclick = () => $('nav').classList.toggle('open');
 const routes = {
   oms: () => import('./oms.js'),
   wms: () => import('./wms.js'),
+  tms: () => import('./tms.js'),
+  driver: () => import('./driver.js'),
 };
 const SOON = { tower: '像素控制塔', tms: 'TMS 調度', driver: '司機 App', exceptions: '異常／缺車', fleet: '車輛資源', projects: '專案管理平台' };
 
