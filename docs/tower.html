@@ -318,8 +318,8 @@ async function poll(){
   try{
     const today=new Date();today.setHours(0,0,0,0);
     const [os,ev,ex,sr,tk,ap,vs]=await Promise.all([
-      q(`orders?select=id,order_no,site_id,location_id,customer_id,status,req_depart_at,req_arrive_at,updated_at,trip_orders(trip_id)&or=(status.not.in.(delivered,cancelled),updated_at.gte.${today.toISOString()})&limit=1000`),
-      q(`tracking_events?select=event,trip_id,order_id,note,recorded_at,orders(order_no,site_id)&recorded_at=gt.${lastEv}&order=recorded_at&limit=200`),
+      q(`orders?select=id,order_no,site_id,location_id,customer_id,status,req_depart_at,req_arrive_at,updated_at,trip_orders(trip_id)&or=(status.not.in.(delivered,cancelled),updated_at.gte.${encodeURIComponent(today.toISOString())})&limit=1000`),
+      q(`tracking_events?select=event,trip_id,order_id,note,recorded_at,orders(order_no,site_id)&recorded_at=gt.${encodeURIComponent(lastEv)}&order=recorded_at&limit=200`),
       q('exceptions?select=id&status=neq.closed'),q('vehicle_shortage_reports?select=id&status=eq.open'),
       q('tasks?select=status,due_date'),q('approvals?select=title,kind,requested_by&status=eq.pending'),q('vehicles?select=status')]);
     if(first){const [locs,cs,sites]=await Promise.all([q('locations?select=id,name'),q('customers?select=id,name'),q('sites?select=id,name')]);
