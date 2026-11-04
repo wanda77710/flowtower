@@ -385,14 +385,20 @@ where (o.status='loaded' and e.lvl<=1) or (o.status='in_transit' and e.lvl<=2+fl
 
 update vehicles set status='on_trip' where id in (select vehicle_id from trips where status='departed');
 
-insert into exceptions(order_id,kind,severity,description,reported_by,status)
-select id,(array['queue_at_fab','late','damage','reject'])[1+floor(random()*4)::int],'mid','廠內排隊超過 40 分鐘','司機回報','open'
-from orders where status='in_transit' order by random() limit 3;
+insert into exceptions(order_id,trip_id,kind,severity,description,reported_by,status,created_at)
+select o.id, tor.trip_id, e.kind, e.sev, e.descr, '司機', e.st, now()-make_interval(mins=>e.ago)
+from (select o.*, row_number() over (order by random()) rn from orders o where o.status in ('in_transit','delivered')) o
+join trip_orders tor on tor.order_id=o.id
+join (values (1,'queue_at_fab','mid','廠內排隊：前面還有 6 台車，預估 40 分鐘','open',25),
+             (2,'damage','high','外箱壓損 2 箱，已拍照','open',50),
+             (3,'late','low','國道塞車，預計晚 20 分鐘','handling',80),
+             (4,'reject','high','客戶表示品項不符，拒收 1 板','open',15),
+             (5,'address','mid','碼頭改到 B2，已轉往','closed',200)) e(n,kind,sev,descr,st,ago) on e.n=o.rn;
 
 insert into vehicle_shortage_reports(site_id,type_code,needed_at,reason_tag,reported_by,status,created_at)
 select (array['HC','TY2','TC','FTZ','HC','TN'])[1+(g%6)], (array['7T','17T','7T','3.5T'])[1+(g%4)], now()-make_interval(hours=>g*5),
   (array['stuck_in_fab','burst_orders','no_consolidation','true_capacity','stuck_in_fab','driver_absent'])[1+(g%6)], '庫房出貨員',
-  (array['covered_cross_site','covered_extra','unresolved','covered_cross_site'])[1+(g%4)], now()-make_interval(hours=>g*5)
+  case when g<=2 then 'open' else (array['covered_cross_site','covered_extra','unresolved','covered_cross_site'])[1+(g%4)] end, now()-make_interval(hours=>g*5)
 from generate_series(1,18) g;
 
 insert into projects(name,owner,dept,goal,expected_deliverable,start_date,due_date,status) values
