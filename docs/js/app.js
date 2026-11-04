@@ -33,6 +33,8 @@ const routes = {
   driver: () => import('./driver.js?v=' + V),
   exceptions: () => import('./exceptions.js?v=' + V),
   fleet: () => import('./fleet.js?v=' + V),
+  projects: () => import('./projects.js?v=' + V),
+  tower: () => import('./tower.js?v=' + V),
 };
 const SOON = { tower: '像素控制塔', tms: 'TMS 調度', driver: '司機 App', exceptions: '異常／缺車', fleet: '車輛資源', projects: '專案管理平台' };
 
