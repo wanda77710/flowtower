@@ -110,7 +110,8 @@ join (values (1,'queue_at_fab','mid','廠內排隊：前面還有 6 台車，預
              (5,'address','mid','碼頭改到 B2，已轉往','closed',200)) e(n,kind,sev,descr,st,ago) on e.n=o.rn;
 
 insert into vehicle_shortage_reports(site_id,type_code,needed_at,reason_tag,reported_by,status,created_at)
-select (array['HC','TY2','TC','FTZ','HC','TN'])[1+(g%6)], (array['7T','17T','7T','3.5T'])[1+(g%4)], now()-make_interval(hours=>g*5),
+select (array['HC','TY2','TC','FTZ','HC','TN'])[1+(g%6)], (array['7T','17T','7T','3.5T'])[1+(g%4)],
+  date_trunc('day', now()) - make_interval(days=>g/3) + make_interval(hours=>(array[8,9,9,10,14,15,15,16,9,10,15,8,14,16,9,15,10,9])[g]),
   (array['stuck_in_fab','burst_orders','no_consolidation','true_capacity','stuck_in_fab','driver_absent'])[1+(g%6)], '庫房出貨員',
   case when g<=2 then 'open' else (array['covered_cross_site','covered_extra','unresolved','covered_cross_site'])[1+(g%4)] end, now()-make_interval(hours=>g*5)
 from generate_series(1,18) g;
