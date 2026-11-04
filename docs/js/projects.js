@@ -122,12 +122,12 @@ export async function render(ui) {
 
   function meetingNotes() {
     const d = ui.drawer('從會議紀錄產生任務', '', `
-      <p class="mut" style="font-size:12px;margin-bottom:8px">一行一個行動項目，格式：<b>任務／負責人／期限(MM/DD)</b>。正式版可接 AI 直接讀整份會議紀錄。</p>
+      <p class="mut" style="font-size:12px;margin-bottom:8px">一行一個行動項目，格式：<b>任務／負責人／期限(MM/DD)</b>（用全形「／」或「|」分隔）。正式版可接 AI 直接讀整份會議紀錄。</p>
       <label class="f">放進哪個專案<select id="p">${D.projects.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label>
       <textarea id="tx" rows="8" style="width:100%;margin-top:10px">整理 HC 倉 10 月缺車明細／組員A／11/12
 與供應商確認晶圓廠排隊時間／組員B／11/15
 試行同廠併單規則一週／組員C／11/20</textarea><div id="pv" style="margin-top:10px"></div>`, '<button class="btn pri" id="ok">建立任務</button>');
-    const parse = () => d.querySelector('#tx').value.split('\n').map(l => l.trim()).filter(Boolean).map(l => { const [title, who, due] = l.split(/[／\/|｜]/).map(s => s?.trim());
+    const parse = () => d.querySelector('#tx').value.split('\n').map(l => l.trim()).filter(Boolean).map(l => { const [title, who, due] = (/[／|｜]/.test(l) ? l.split(/[／|｜]/) : l.split(/\s+\/\s+/)).map(s => s?.trim());
       let date = null; if (due) { const m = due.match(/(\d{1,2})[\/\-.](\d{1,2})/); if (m) { const y = new Date().getFullYear(); date = `${y}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`; } }
       return { title, assignee: who || null, due_date: date }; }).filter(x => x.title);
     const pv = () => { d.querySelector('#pv').innerHTML = `<table class="t">${parse().map(x => `<tr><td>${esc(x.title)}</td><td>${esc(x.assignee || '—')}</td><td class="mono">${x.due_date || '—'}</td></tr>`).join('')}</table>`; };
