@@ -312,7 +312,7 @@ function flagOf(o){const now=Date.now(),dep=+new Date(o.req_depart_at),eta=+new 
   if(['picked','loaded'].includes(s)&&now>dep)return['r','T0 未出車'];
   if(s==='in_transit'){if(now>eta+30*m)return['r','ETA+30 未送達'];if(now>eta)return['y','超過 ETA'];}
   return['g','正常'];}
-let orders=[],delivered=0,onTime=0,couriers=0,lastEv=new Date().toISOString(),first=true,approvals=[],brainNotes=0,live=false;
+let orders=[],delivered=0,onTime=0,couriers=0,lastEv=new Date(Date.now()-15*60000).toISOString(),first=true,approvals=[],brainNotes=0,live=false;
 const prevFlag={},STATS={merge:0,short:0,exc:0,overdue:0,idle:0,transit:0},LOC={},CUS={},seenTrip=new Set();
 async function poll(){
   try{
@@ -330,12 +330,15 @@ async function poll(){
     const dl=orders.filter(o=>o.stage===3);delivered=dl.length;onTime=dl.filter(o=>+new Date(o.upd)<=+new Date(o.eta)+30*60000).length;
     orders.forEach(o=>{if(!first&&o.flag==='r'&&prevFlag[o.dbid]&&prevFlag[o.dbid]!=='r')alarm(o,o.why);prevFlag[o.dbid]=o.flag;});
     // 動畫：司機回報事件
-    ev.forEach(e=>{lastEv=e.recorded_at>lastEv?e.recorded_at:lastEv;const o=orders.find(x=>x.dbid===e.order_id),w=o?.w||WH.find(x=>x.code===e.orders?.site_id),no=e.orders?.order_no||'';if(!w)return;
-      if(e.event==='handover')handover({w,id:no});
+    ev.forEach(e=>{lastEv=e.recorded_at>lastEv?e.recorded_at:lastEv;});
+    const replay=first?ev.slice(-14):ev;
+    replay.forEach((e,i)=>first?setTimeout(()=>handleEv(e),1200+i*1800):handleEv(e));
+    function handleEv(e){const o=orders.find(x=>x.dbid===e.order_id),w=o?.w||WH.find(x=>x.code===e.orders?.site_id),no=e.orders?.order_no||'';if(!w)return;
+      if(e.event==='handover'){handover({w,id:no});log(`<span style="color:#ffe08a">📦 ${fmtHM(e.recorded_at)} ${w.code} ${no} 交車</span>`);}
       else if(e.event==='depart'){if(!seenTrip.has(e.trip_id)){seenTrip.add(e.trip_id);spawnTruck(w,no);}log(`<span style="color:#9fe8ff">🚚 ${fmtHM(e.recorded_at)} ${w.code} ${no} 出發</span>`);}
       else if(e.event==='delivered'){log(`<span style="color:#7dffb0">✓ ${fmtHM(e.recorded_at)} ${no} 完成交貨</span>`);sparks.push({x:(w.r.x+5)*T,y:(w.r.y+4)*T,tx:52.5*T,ty:18*T,t:0,c:w.c});}
       else if(e.event==='exception'){log(`<span style="color:#ff8a95">⚠ ${fmtHM(e.recorded_at)} ${no} 異常：${esc(e.note||'')}</span>`);w.flash=4;toast(`⚠ ${no}・${e.note||'司機回報異常'}`);}
-      else if(e.event==='arrive_gate'||e.event==='arrive_dock')log(`<span style="color:#cfd8ff">📍 ${fmtHM(e.recorded_at)} ${no} ${e.event==='arrive_gate'?'抵達哨口':'抵達碼頭'}</span>`);});
+      else if(e.event==='arrive_gate'||e.event==='arrive_dock')log(`<span style="color:#cfd8ff">📍 ${fmtHM(e.recorded_at)} ${no} ${e.event==='arrive_gate'?'抵達哨口':'抵達碼頭'}</span>`);}
     // AI 助理的即時數字
     const by={};orders.filter(o=>!o.trip&&o.stage<2).sort((a,b)=>+new Date(a.dep)-+new Date(b.dep)).forEach(o=>{const g=by[o.w.code+'|'+o.loc]||=[];const l=g[g.length-1];if(l&&+new Date(o.dep)-+new Date(l[0].dep)<=45*60000)l.push(o);else g.push([o]);});
     STATS.merge=Object.values(by).flat().reduce((s,g)=>s+g.length-1,0);STATS.short=sr.length;STATS.exc=ex.length;

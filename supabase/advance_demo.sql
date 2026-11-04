@@ -1,5 +1,5 @@
 -- =====================================================================
--- Demo 自動運轉：每 2 分鐘把「假資料訂單」依時間往下一步推進
+-- Demo 自動運轉：每 1 分鐘把「假資料訂單」依時間往下一步推進
 -- 只動 created_by 以 'OP-' 開頭的系統假單；客戶／使用者手動建立的單不動
 -- 約 12% 的單會刻意延誤，讓燈號、警示、異常自然出現
 -- =====================================================================
@@ -111,5 +111,5 @@ end $fn$;
 grant execute on function advance_demo() to anon, authenticated;
 
 select cron.unschedule('ft-advance-demo') where exists (select 1 from cron.job where jobname='ft-advance-demo');
-select cron.schedule('ft-advance-demo', '*/2 * * * *', $$select public.advance_demo()$$);
+select cron.schedule('ft-advance-demo', '* * * * *', $$select public.advance_demo()$$);
 select public.advance_demo();

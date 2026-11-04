@@ -419,7 +419,7 @@ from projects p join (values
  ('帳單自動化','車單變更欄位定義','組員B',4,'review','欄位規格'),
  ('帳單自動化','對帳差異報表','組員C',15,'todo','差異報表')
 ) t(pn,title,who,d,st,dl) on t.pn=p.name;
-insert into approvals(kind,title,requested_by) values
- ('vehicle_move','HC 支援 TY2 一台 17T（14:00–18:00）','調度'),
- ('task_review','車單變更欄位定義 → 送審','組員B'),
- ('exception_close','結案：星辰竹科廠排隊延誤','調度');
+insert into approvals(kind,ref_id,title,requested_by) values
+ ('vehicle_move',null,'HC 支援 TY2 一台 17T（14:00–18:00）','調度'),
+ ('task_review',(select id from tasks where title='車單變更欄位定義' limit 1),'車單變更欄位定義 → 送審','組員B'),
+ ('exception_close',(select id from exceptions where kind='damage' limit 1),'結案：外箱壓損 2 箱（高嚴重度）','調度');
