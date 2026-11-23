@@ -6,7 +6,8 @@ a{color:inherit}
 /* nav */
 #nav{width:216px;flex:0 0 216px;background:var(--nav);color:#c9d2e3;display:flex;flex-direction:column;height:100vh;position:sticky;top:0}
 #nav .logo{padding:18px 18px 14px;font-family:var(--px);font-size:20px;color:#fff;letter-spacing:.04em;display:flex;align-items:center;gap:8px}
-#nav .logo i{width:14px;height:14px;background:var(--teal);box-shadow:4px 4px 0 #f2b233}
+#nav .logo{text-decoration:none}
+#nav .logo img{width:32px;height:32px;border-radius:6px;image-rendering:pixelated}
 #nav .logo small{display:block;font-size:11px;color:#7f8aa3;font-family:"Noto Sans TC";letter-spacing:0}
 #nav nav{flex:1;overflow:auto;padding:6px 10px}
 #nav .grp{font-size:10px;letter-spacing:.14em;color:#5c6782;margin:14px 8px 6px}
@@ -95,3 +96,20 @@ table.t{width:100%;border-collapse:collapse;background:var(--card)}
   .split{grid-template-columns:1fr}
   #drawer{width:100%}
 }
+
+/* ---- 像素插圖（Higgsfield 生成） ---- */
+#nav a .ico{width:22px;height:22px;border-radius:5px;flex:0 0 22px;object-fit:cover;image-rendering:pixelated}
+#nav a.on .ico{box-shadow:0 0 0 1px rgba(255,255,255,.55)}
+.hero{position:relative;border-radius:16px;overflow:hidden;background:#0d1020 url(../img/hero.webp) center 35%/cover no-repeat;aspect-ratio:16/7;min-height:260px;display:flex;align-items:flex-end;margin-bottom:18px;image-rendering:pixelated}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,14,30,.88) 0%,rgba(10,14,30,.55) 45%,rgba(10,14,30,0) 75%)}
+.hero .in{position:relative;z-index:1;padding:28px 32px;max-width:560px;width:100%;box-sizing:border-box;min-width:0;color:#fff}
+.hero h2{font-family:var(--px);font-size:30px;letter-spacing:.04em;margin:0 0 8px}
+.hero p{color:#c9d2e3;margin:0 0 16px;line-height:1.6}
+.hero .btn{background:var(--teal);border-color:var(--teal);color:#fff;text-decoration:none;display:inline-block}
+.hero .btn.ghost{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.3);margin-left:6px}
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.mod{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;text-decoration:none;color:var(--ink);transition:transform .15s,box-shadow .15s}
+.mod:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(20,26,40,.12)}
+.mod img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#141a28;image-rendering:pixelated}
+.mod div{padding:12px 14px}.mod b{display:block;font-size:15px}.mod span{color:var(--mut);font-size:12px}
+@media (max-width:720px){.hero{aspect-ratio:auto;min-height:300px}.hero::after{background:linear-gradient(0deg,rgba(10,14,30,.92) 0%,rgba(10,14,30,.45) 60%,rgba(10,14,30,.1) 100%)}.hero h2{font-size:22px}.hero p{font-size:13px}.hero .in{padding:20px}.mods{grid-template-columns:1fr 1fr;gap:10px}.mod div{padding:10px}.mod b{font-size:14px}}

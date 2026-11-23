@@ -27,6 +27,7 @@ $('menuBtn').onclick = () => $('nav').classList.toggle('open');
 
 const V = new URL(import.meta.url).searchParams.get('v') || '1';
 const routes = {
+  home: () => import('./home.js?v=' + V),
   oms: () => import('./oms.js?v=' + V),
   wms: () => import('./wms.js?v=' + V),
   tms: () => import('./tms.js?v=' + V),
@@ -40,14 +41,14 @@ const SOON = { tower: '像素控制塔', tms: 'TMS 調度', driver: '司機 App'
 
 let timer = null;
 async function route() {
-  const r = (location.hash.slice(1) || 'oms').split('?')[0];
+  const r = (location.hash.slice(1) || 'home').split('?')[0];
   document.querySelectorAll('#nav a').forEach(a => a.classList.toggle('on', a.dataset.r === r));
   $('nav').classList.remove('open'); ui.closeDrawer();
   if (timer) { clearInterval(timer); timer = null; }
   if (!routes[r]) { ui.head(SOON[r] || '頁面', '開發中'); ui.view(`<div class="card empty">「${SOON[r] || r}」正在建置中，Demo 週內上線。</div>`); return; }
   ui.view('<div class="loading">載入中…</div>');
   try {
-    await master();
+    if (r !== 'home') await master();
     const mod = await routes[r]();
     const refresh = await mod.render(ui);
     if (refresh) timer = setInterval(() => { if (!$('drawer').classList.contains('open')) refresh(); }, 15000);
