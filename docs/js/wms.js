@@ -1,10 +1,11 @@
 import { api, master, flagOf, STATUS, fmtT, fmtHM, esc, inList } from './api.js';
 
-let SITE = (() => { try { return localStorage.getItem('ft_site') || 'HC'; } catch { return 'HC'; } })();
+let SITE = (() => { try { return localStorage.getItem('ft_site') || 'H1'; } catch { return 'H1'; } })();
 let TAB = 'pick', SEL = null;
 
 export async function render(ui) {
   const M = await master();
+  if (!M.site[SITE]) SITE = M.sites[0]?.id;  // 舊代碼（瀏覽器記住的）已不存在時改用第一個庫房
   ui.head('WMS 倉庫', '撿貨 → 扣帳 → 交車給司機');
   const a = ui.actions(`<select id="site">${M.sites.map(s => `<option value="${s.id}" ${s.id === SITE ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select>`);
   a.querySelector('#site').onchange = e => { SITE = e.target.value; SEL = null; try { localStorage.setItem('ft_site', SITE); } catch { } load(); };

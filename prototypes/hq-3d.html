@@ -135,7 +135,7 @@ th{color:var(--mut);font-weight:500;font-size:10px}
 <div id="hint">WASD／方向鍵或搖桿走動 · 點房間或人物查看</div>
 
 <div id="side">
-  <div id="sideH"><div class="ic" id="sIc">FTZ</div><div><h3 id="sT">-</h3><p id="sS">-</p></div><button id="close">×</button></div>
+  <div id="sideH"><div class="ic" id="sIc">N1</div><div><h3 id="sT">-</h3><p id="sS">-</p></div><button id="close">×</button></div>
   <div id="sideB"></div>
   <div id="qs"></div>
   <form id="form"><input id="q" placeholder="問這個 agent…" autocomplete="off"><button>送出</button></form>
@@ -298,9 +298,9 @@ function billboard(x,z,w,h,rotY){
    ========================================================= */
 const TZ=new THREE.Vector3(-24,0,0);
 const WH=[
- {code:'FTZ',name:'FTZ 自貿區倉',c:0x3ea0ff},{code:'TY2',name:'TY2 桃園二倉',c:0xff8a3d},{code:'HC',name:'HC 新竹倉',c:0xffc93d},
- {code:'XS',name:'XS 倉',c:0xb276ff},{code:'LK',name:'LK 倉',c:0x3ed98f},{code:'TC',name:'TC 台中倉',c:0xff5d8f},
- {code:'TN',name:'TN 台南倉',c:0x2ed3d3},{code:'QT',name:'QT 倉',c:0x8fd14a},{code:'QZ',name:'QZ 倉',c:0xff6f5d}];
+ {code:'N1',name:'N1 北一倉',c:0x3ea0ff},{code:'N2',name:'N2 北二倉',c:0xff8a3d},{code:'H1',name:'H1 竹一倉',c:0xffc93d},
+ {code:'H2',name:'H2 竹二倉',c:0xb276ff},{code:'N3',name:'N3 北三倉',c:0x3ed98f},{code:'C1',name:'C1 中一倉',c:0xff5d8f},
+ {code:'S1',name:'S1 南一倉',c:0x2ed3d3},{code:'N4',name:'N4 北四倉',c:0x8fd14a},{code:'S2',name:'S2 南二倉',c:0xff6f5d}];
 const CUST=['晶圓廠 A','晶圓廠 B','封測廠 C','設備商 D','材料商 E','面板廠 F'];
 const DEST=['新竹科學園區','中科','南科','龍潭','竹南','林口','台北港','高雄港'];
 const tHub=hub(TZ.x,TZ.z,0x59b8ff,'TMS 核心','hubT');

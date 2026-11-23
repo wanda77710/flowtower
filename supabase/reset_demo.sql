@@ -7,11 +7,11 @@ truncate approvals, tasks, projects, vehicle_moves, vehicle_shortage_reports, ex
   drivers, vehicles, vehicle_types, carriers, inventory, products, locations, customers, sites cascade;
 
 insert into sites(id,name,region,lat,lng,color) values
- ('FTZ','FTZ 自貿區倉','北區',25.08,121.23,'#4aa3ff'),('TY2','TY2 桃園二倉','北區',24.99,121.30,'#ff8a3d'),
- ('HC','HC 新竹倉','竹區',24.80,120.99,'#f2c230'),('XS','XS 倉','竹區',24.78,121.01,'#a77bff'),
- ('LK','LK 倉','北區',25.06,121.37,'#3fc77a'),('TC','TC 台中倉','中區',24.20,120.62,'#ff5d8f'),
- ('TN','TN 台南倉','南區',23.10,120.29,'#22c3c3'),('QT','QT 倉','北區',25.02,121.20,'#8fc43a'),
- ('QZ','QZ 倉','南區',22.70,120.33,'#ff6f5d');
+ ('N1','N1 北一倉','北區',25.08,121.23,'#4aa3ff'),('N2','N2 北二倉','北區',24.99,121.30,'#ff8a3d'),
+ ('H1','H1 竹一倉','竹區',24.80,120.99,'#f2c230'),('H2','H2 竹二倉','竹區',24.78,121.01,'#a77bff'),
+ ('N3','N3 北三倉','北區',25.06,121.37,'#3fc77a'),('C1','C1 中一倉','中區',24.20,120.62,'#ff5d8f'),
+ ('S1','S1 南一倉','南區',23.10,120.29,'#22c3c3'),('N4','N4 北四倉','北區',25.02,121.20,'#8fc43a'),
+ ('S2','S2 南二倉','南區',22.70,120.33,'#ff6f5d');
 
 insert into customers(code,name,is_fab) values
  ('C01','星辰半導體',true),('C02','曜光晶圓',true),('C03','禾豐封測',true),
@@ -19,16 +19,16 @@ insert into customers(code,name,is_fab) values
 
 insert into locations(customer_id,name,address,gate_name,dock_name,lat,lng,std_travel_min)
 select c.id, v.name, v.addr, v.gate, v.dock, v.lat, v.lng, v.std::jsonb from (values
- ('C01','星辰 竹科一廠','新竹科學園區','北哨','D3',24.78,121.00,'{"HC":15,"XS":12,"FTZ":70,"TY2":55}'),
- ('C01','星辰 南科十八廠','台南科學園區','東哨','B1',23.11,120.27,'{"TN":15,"QZ":45,"TC":110}'),
- ('C02','曜光 中科廠','台中科學園區','2號哨','A5',24.21,120.61,'{"TC":20,"HC":75}'),
- ('C02','曜光 竹南廠','苗栗竹南','南哨','C2',24.69,120.88,'{"HC":30,"XS":28,"TC":60}'),
- ('C03','禾豐 龍潭廠','桃園龍潭','正門','D1',24.86,121.21,'{"TY2":25,"QT":30,"HC":40}'),
- ('C03','禾豐 高雄廠','高雄楠梓','西哨','B4',22.73,120.32,'{"QZ":15,"TN":45}'),
- ('C04','聯程 林口廠','新北林口','大門','1',25.07,121.36,'{"LK":10,"FTZ":30,"TY2":35}'),
- ('C05','藍海 觀音廠','桃園觀音','大門','2',25.03,121.08,'{"QT":20,"TY2":30,"FTZ":35}'),
- ('C06','晨曦 台中港','台中港','港區','5',24.27,120.51,'{"TC":35}'),
- ('C05','藍海 台北港','新北八里','港區','7',25.15,121.38,'{"FTZ":40,"LK":30}')
+ ('C01','星辰 竹科一廠','新竹科學園區','北哨','D3',24.78,121.00,'{"H1":15,"H2":12,"N1":70,"N2":55}'),
+ ('C01','星辰 南科十八廠','台南科學園區','東哨','B1',23.11,120.27,'{"S1":15,"S2":45,"C1":110}'),
+ ('C02','曜光 中科廠','台中科學園區','2號哨','A5',24.21,120.61,'{"C1":20,"H1":75}'),
+ ('C02','曜光 竹南廠','苗栗竹南','南哨','C2',24.69,120.88,'{"H1":30,"H2":28,"C1":60}'),
+ ('C03','禾豐 龍潭廠','桃園龍潭','正門','D1',24.86,121.21,'{"N2":25,"N4":30,"H1":40}'),
+ ('C03','禾豐 高雄廠','高雄楠梓','西哨','B4',22.73,120.32,'{"S2":15,"S1":45}'),
+ ('C04','聯程 林口廠','新北林口','大門','1',25.07,121.36,'{"N3":10,"N1":30,"N2":35}'),
+ ('C05','藍海 觀音廠','桃園觀音','大門','2',25.03,121.08,'{"N4":20,"N2":30,"N1":35}'),
+ ('C06','晨曦 台中港','台中港','港區','5',24.27,120.51,'{"C1":35}'),
+ ('C05','藍海 台北港','新北八里','港區','7',25.15,121.38,'{"N1":40,"N3":30}')
 ) v(cc,name,addr,gate,dock,lat,lng,std) join customers c on c.code=v.cc;
 
 insert into products(sku,name,unit,weight_kg)
@@ -110,7 +110,7 @@ join (values (1,'queue_at_fab','mid','廠內排隊：前面還有 6 台車，預
              (5,'address','mid','碼頭改到 B2，已轉往','closed',200)) e(n,kind,sev,descr,st,ago) on e.n=o.rn;
 
 insert into vehicle_shortage_reports(site_id,type_code,needed_at,reason_tag,reported_by,status,created_at)
-select (array['HC','TY2','TC','FTZ','HC','TN'])[1+(g%6)], (array['7T','17T','7T','3.5T'])[1+(g%4)],
+select (array['H1','N2','C1','N1','H1','S1'])[1+(g%6)], (array['7T','17T','7T','3.5T'])[1+(g%4)],
   (date_trunc('day', now() at time zone 'Asia/Taipei') - make_interval(days=>g/3) + make_interval(hours=>(array[8,9,9,10,14,15,15,16,9,10,15,8,14,16,9,15,10,9])[g])) at time zone 'Asia/Taipei',
   (array['stuck_in_fab','burst_orders','no_consolidation','true_capacity','stuck_in_fab','driver_absent'])[1+(g%6)], '庫房出貨員',
   case when g<=2 then 'open' else (array['covered_cross_site','covered_extra','unresolved','covered_cross_site'])[1+(g%4)] end, now()-make_interval(hours=>g*5)
@@ -124,7 +124,7 @@ insert into tasks(project_id,title,assignee,reviewer,due_date,status,deliverable
 select p.id, t.title, t.who, '組長', current_date+t.d, t.st, t.dl, '週會'
 from projects p join (values
  ('缺車根因改善','整理近 3 個月缺車通報','組員A',-3,'done','原因分類統計表'),
- ('缺車根因改善','訪談 HC、TY2 出貨員','組員B',2,'doing','訪談紀錄'),
+ ('缺車根因改善','訪談 H1、N2 出貨員','組員B',2,'doing','訪談紀錄'),
  ('缺車根因改善','設計同廠同時段併單規則','組員A',10,'todo','規則文件'),
  ('司機點擊回報上線','LIFF 介面測試','組員C',-1,'overdue','測試報告'),
  ('司機點擊回報上線','供應商說明會','組員B',5,'todo','簡報＋簽到'),
@@ -134,13 +134,13 @@ from projects p join (values
  ('帳單自動化','對帳差異報表','組員C',15,'todo','差異報表')
 ) t(pn,title,who,d,st,dl) on t.pn=p.name;
 insert into approvals(kind,ref_id,title,requested_by) values
- ('vehicle_move',null,'HC 支援 TY2 一台 17T（14:00–18:00）','調度'),
+ ('vehicle_move',null,'H1 支援 N2 一台 17T（14:00–18:00）','調度'),
  ('task_review',(select id from tasks where title='車單變更欄位定義' limit 1),'車單變更欄位定義 → 送審','組員B'),
  ('exception_close',(select id from exceptions where kind='damage' limit 1),'結案：外箱壓損 2 箱（高嚴重度）','調度');
 
   return 'ok ' || now();
 end $fn$;
-grant execute on function reset_demo() to anon, authenticated;
+revoke execute on function reset_demo() from public, anon, authenticated;  -- 只給 pg_cron；對外按鈕走 reset_demo_public()（見 security.sql）
 
 -- 每天台灣時間 06:00 自動重置（pg_cron 用 UTC：22:00）
 create extension if not exists pg_cron;
