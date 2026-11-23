@@ -17,7 +17,7 @@ $('dX').onclick = ui.closeDrawer; $('mask').onclick = ui.closeDrawer;
 $('resetBtn').onclick = async () => {
   if (!confirmBox()) return;
   $('resetBtn').disabled = true; $('resetBtn').textContent = '重置中…';
-  try { await api.rpc('reset_demo'); await master(true); ui.toast('已用目前時間重新產生 Demo 資料'); route(); }
+  try { const r = await api.rpc('reset_demo_public'); if (String(r).startsWith('skipped')) { ui.toast('剛剛已重置過，請 1 分鐘後再試'); return; } await master(true); ui.toast('已用目前時間重新產生 Demo 資料'); route(); }
   catch (e) { ui.toast('重置失敗：' + e.message.slice(0, 100), true); }
   $('resetBtn').disabled = false; $('resetBtn').textContent = '↻ 重置 Demo 資料';
 };

@@ -108,7 +108,7 @@ begin
 
   return 'advanced ' || now();
 end $fn$;
-grant execute on function advance_demo() to anon, authenticated;
+revoke execute on function advance_demo() from public, anon, authenticated;  -- 只給 pg_cron；對外按鈕走 reset_demo_public()（見 security.sql）
 
 select cron.unschedule('ft-advance-demo') where exists (select 1 from cron.job where jobname='ft-advance-demo');
 select cron.schedule('ft-advance-demo', '* * * * *', $$select public.advance_demo()$$);

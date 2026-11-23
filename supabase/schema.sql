@@ -8,7 +8,7 @@ create extension if not exists "pgcrypto";
 
 -- ---------- 主檔 Master data ----------
 create table sites (               -- 庫房 / 倉庫（控制點）
-  id          text primary key,     -- 'FTZ','TY2','HC',...
+  id          text primary key,     -- 'N1','N2','H1',...
   name        text not null,
   region      text,
   lat numeric, lng numeric,
@@ -30,7 +30,7 @@ create table locations (           -- 收貨點（客戶廠區/碼頭）
   gate_name   text,                 -- 哨口
   dock_name   text,                 -- 碼頭
   lat numeric, lng numeric,
-  std_travel_min jsonb default '{}'::jsonb  -- {"FTZ":45,"HC":30} 標準行車時間
+  std_travel_min jsonb default '{}'::jsonb  -- {"N1":45,"H1":30} 標準行車時間
 );
 
 create table products (
@@ -276,13 +276,14 @@ create trigger trg_orders_touch before update on orders for each row execute fun
 -- ---------- Realtime（控制塔即時動畫） ----------
 alter publication supabase_realtime add table orders, trips, tracking_events, exceptions, vehicle_shortage_reports, approvals;
 
--- ---------- RLS：Demo 模式（任何人可讀寫假資料） ----------
+-- ---------- RLS：預設只能讀；Demo 需要的新增/修改權限請接著執行 security.sql ----------
 -- ⚠ 正式上線前必須改成依登入者角色（客戶/倉庫/調度/司機/管理者）限制
 do $$ declare t text; begin
   foreach t in array array['sites','customers','locations','products','inventory','carriers','vehicle_types','vehicles','drivers',
     'rate_cards','orders','order_lines','order_changes','pick_tasks','inventory_tx','trips','trip_orders','tracking_events',
     'exceptions','vehicle_shortage_reports','vehicle_moves','projects','tasks','approvals'] loop
     execute format('alter table %I enable row level security', t);
-    execute format('create policy demo_all on %I for all to anon, authenticated using (true) with check (true)', t);
+    execute format('drop policy if exists demo_read on %I', t);
+    execute format('create policy demo_read on %I for select to anon, authenticated using (true)', t);
   end loop;
 end $$;

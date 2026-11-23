@@ -146,9 +146,9 @@ fill(0,37,65,39,6);          // road
 for(const x of [6,7,18,19,30,31]) map[36][x]=5; // dock gates
 
 const WH=[
- {code:'FTZ',name:'FTZ 自貿區倉',c:'#4aa3ff'},{code:'TY2',name:'TY2 桃園二倉',c:'#ff8a3d'},{code:'HC',name:'HC 新竹倉',c:'#f2c230'},
- {code:'XS',name:'XS 倉',c:'#a77bff'},{code:'LK',name:'LK 倉',c:'#3fc77a'},{code:'TC',name:'TC 台中倉',c:'#ff5d8f'},
- {code:'TN',name:'TN 台南倉',c:'#22c3c3'},{code:'QT',name:'QT 倉',c:'#8fc43a'},{code:'QZ',name:'QZ 倉',c:'#ff6f5d'}];
+ {code:'N1',name:'N1 北一倉',c:'#4aa3ff'},{code:'N2',name:'N2 北二倉',c:'#ff8a3d'},{code:'H1',name:'H1 竹一倉',c:'#f2c230'},
+ {code:'H2',name:'H2 竹二倉',c:'#a77bff'},{code:'N3',name:'N3 北三倉',c:'#3fc77a'},{code:'C1',name:'C1 中一倉',c:'#ff5d8f'},
+ {code:'S1',name:'S1 南一倉',c:'#22c3c3'},{code:'N4',name:'N4 北四倉',c:'#8fc43a'},{code:'S2',name:'S2 南二倉',c:'#ff6f5d'}];
 const RX=[2,14,26], RY=[2,13,24];
 WH.forEach((w,i)=>{
   const rx=RX[i%3], ry=RY[Math.floor(i/3)];
