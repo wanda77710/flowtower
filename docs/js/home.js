@@ -13,7 +13,7 @@ const MODS = [
 export async function render(ui) {
   ui.head('總覽首頁', '從接單到送達，一座塔台看全部');
   ui.view(`
-    <section class="hero"><div class="in">
+    <section class="hero"><video class="bgv" src="img/hero.mp4" poster="img/hero.webp" autoplay muted loop playsinline preload="metadata" aria-hidden="true"></video><div class="in">
       <h2>FlowTower 物流塔台</h2>
       <p>OMS、WMS、TMS、司機、異常與車隊，在同一個平台即時串起來。</p>
       <a class="btn" href="#tower">進入控制塔</a><a class="btn ghost" href="#oms">從訂單開始</a>
