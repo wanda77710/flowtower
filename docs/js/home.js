@@ -8,6 +8,7 @@ const MODS = [
   ['exceptions', 'exceptions.webp', '異常／缺車', '延誤、缺車與異常處理'],
   ['fleet', 'fleet.webp', '車輛資源', '車隊、供應商與跨倉調車'],
   ['projects', 'projects.webp', '專案管理平台', '任務看板、核准與追蹤'],
+  ['reports', 'reports.svg', '管理報表', '運輸商績效、營收、車輛週轉'],
 ];
 
 export async function render(ui) {
