@@ -5,7 +5,7 @@
 | seed.sql | 假資料 |
 | reset_demo.sql | `reset_demo()`：以現在時間重產假資料；pg_cron 每天 06:00（台灣）執行 |
 | advance_demo.sql | `advance_demo()`：每 1 分鐘把假資料訂單依時間推進（自動運轉）；只動 created_by 以 `OP-` 開頭的單 |
-| reports.sql | 管理報表：90 天歷史車趟／內部同仁待辦／缺車對照閒置（rpt_ 資料表，唯讀）、Demo 費率、報表函式 `rpt_carriers / rpt_people / rpt_revenue / rpt_fleet`；pg_cron 每天 06:05 重產 |
+| reports.sql | 管理報表 v2：11 項管理指標 × 5 個角度（運輸商／司機／管理同仁／客戶／站點）× 趨勢。180 天歷史（rpt_ 資料表，唯讀）、教育訓練、跟車稽核、管理同仁↔運輸商對應、目標值表 `rpt_kpi_defs`；函式 `rpt_overview / rpt_kpi / rpt_kpi_detail / rpt_fleet / rpt_staff`；pg_cron 每天 06:05 重產 |
 | security.sql | 權限強化：公開訪客可讀、可做 Demo 操作，但不能刪除/清空、主檔唯讀、文字與筆數上限；對外重置按鈕 `reset_demo_public()` 每 60 秒最多一次 |
 | setup_all.sql | schema + seed 一次建立 |
 
