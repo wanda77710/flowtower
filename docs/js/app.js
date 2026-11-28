@@ -37,6 +37,8 @@ const routes = {
   projects: () => import('./projects.js?v=' + V),
   tower: () => import('./tower.js?v=' + V),
   reports: () => import('./reports.js?v=' + V),
+  control: () => import('./control.js?v=' + V),
+  rules: () => import('./rules.js?v=' + V),
 };
 const SOON = { tower: '像素控制塔', tms: 'TMS 調度', driver: '司機 App', exceptions: '異常／缺車', fleet: '車輛資源', projects: '專案管理平台' };
 

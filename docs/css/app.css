@@ -180,3 +180,19 @@ table.t{width:100%;border-collapse:collapse;background:var(--card)}
 .t tr.sel td{background:#eef9f7}.t tr.dim td{color:var(--mut)}
 .legend .tgti{background:none;border-top:2px dashed #e5484d;height:0;width:14px;vertical-align:3px}
 .kpi small.note{font-size:12px;line-height:1.5}
+/* ---- 派車推薦 / 即時管控 / 規則維護 ---- */
+.pickcard.rec{padding:12px}
+.recsc{margin-left:auto;font-size:20px;color:var(--teal)}.recsc small{font-size:12px;color:var(--mut);font-weight:400}
+.parts{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 10px;margin-top:8px}
+.parts span{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--mut)}
+.parts span i{display:block;height:5px;border-radius:3px;background:var(--teal);min-width:2px}
+.parts span{position:relative}.parts span::before{content:"";position:absolute;left:0;right:0;top:0;height:5px;border-radius:3px;background:#edf0f4;z-index:0}
+.parts span i{position:relative;z-index:1}.parts em{font-style:normal}
+.why{font-size:12px;line-height:1.6;margin-top:6px;padding:6px 8px;border-radius:8px}
+.why.ok{background:#eef9f3;color:#16794a}.why.warn{background:#fff6e5;color:#8a5a00}
+.recsum{font-size:12px;color:var(--mut);background:#f6f8fa;border-radius:8px;padding:8px 10px;margin:12px 0 10px;line-height:1.6}
+.recsum b{color:var(--ink)}
+.t.ctl tr.esc td{background:#fff1f1}
+.ntf{cursor:default;white-space:nowrap;border-bottom:1px dashed var(--line)}
+input.num{width:80px;text-align:right}
+.kpi small.mut{display:block;font-size:12px}

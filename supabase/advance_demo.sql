@@ -21,9 +21,11 @@ begin
   update pick_tasks p set status='done', done_at=now() from u where p.order_id=u.id;
   update order_lines l set picked_qty=qty from orders o where l.order_id=o.id and o.created_by like 'OP-%' and o.status in ('picked','loaded','in_transit','delivered') and l.picked_qty=0;
 
-  -- 4) 派車（出車前 25 分鐘，沒車就送缺車通報）
-  for r in select o.* from orders o where o.created_by like 'OP-%' and o.status='picked'
-      and now() > o.req_depart_at - interval '25 min' and not exists (select 1 from trip_orders t where t.order_id=o.id) loop
+  -- 4) 派車（出車前 45 分鐘；約 6% 晚派車：出車前 20 分鐘＝黃燈、約 2% 出車前 3 分鐘＝紅燈；沒車就送缺車通報）
+  for r in select o.* from orders o where o.created_by like 'OP-%' and o.status in ('released','picking','picked')
+      and now() > o.req_depart_at - make_interval(mins => case when abs(hashtext(o.order_no||'d'))%100 between 40 and 45 then 20
+                                                             when abs(hashtext(o.order_no||'d'))%100 between 46 and 47 then 3 else 45 end)
+      and not exists (select 1 from trip_orders t where t.order_id=o.id) loop
     select id into v_id from vehicles where home_site=r.site_id and status='idle' order by random() limit 1;
     if v_id is null then
       insert into vehicle_shortage_reports(site_id,type_code,needed_at,order_ids,reason_tag,reported_by,status)
@@ -45,9 +47,9 @@ begin
     e as (insert into tracking_events(trip_id,order_id,event,note) select t.trip_id,u.id,'handover','倉庫掃碼交車' from u join trip_orders t on t.order_id=u.id returning trip_id)
   update trips set status='handover' where id in (select trip_id from e) and status in ('planned','dispatched');
 
-  -- 6) 已交車 → 配送中（出車時間 + 0~8 分鐘；延誤單 +25）
+  -- 6) 已交車 → 配送中（出車時間 −6~+2 分鐘；延誤單 +25）
   with u as (update orders o set status='in_transit' where created_by like 'OP-%' and status='loaded'
-      and now() > req_depart_at + make_interval(mins => abs(hashtext(order_no))%9 + case when abs(hashtext(order_no))%100<12 then 25 else 0 end) returning id),
+      and now() > req_depart_at + make_interval(mins => abs(hashtext(order_no))%9 - 6 + case when abs(hashtext(order_no))%100<12 then 25 else 0 end) returning id),
     e as (insert into tracking_events(trip_id,order_id,event) select t.trip_id,u.id,'depart' from u join trip_orders t on t.order_id=u.id returning trip_id),
     tr as (update trips set status='departed' where id in (select trip_id from e) returning vehicle_id)
   update vehicles set status='on_trip' where id in (select vehicle_id from tr);

@@ -46,10 +46,14 @@ export function flagOf(o, now = Date.now()) {
     if (now > dep - 5 * m) return ['r', 'T−5 未備妥'];
     if (now > dep - 15 * m) return ['y', 'T−15 未備妥'];
   }
-  if (['picked', 'loaded'].includes(s) && now > dep) return ['r', 'T0 未出車'];
+  // 出車、配達：和管理報表同一套定義（準時出車 = T0+15 內出發；準時配達 = ETA 前送達）
+  if (['picked', 'loaded'].includes(s)) {
+    if (now > dep + 15 * m) return ['r', 'T+15 未出車'];
+    if (now > dep) return ['y', '過 T0 未出車'];
+  }
   if (s === 'in_transit') {
-    if (now > eta + 30 * m) return ['r', 'ETA+30 未送達'];
-    if (now > eta) return ['y', '超過 ETA'];
+    if (now > eta) return ['r', '超過 ETA'];
+    if (now > eta - 10 * m) return ['y', '快到 ETA'];
   }
   return ['g', '正常'];
 }

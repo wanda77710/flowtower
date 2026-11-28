@@ -82,7 +82,7 @@ alter table demo_meta enable row level security;   -- 沒有任何 policy = 外�
 
 create or replace function reset_demo_public() returns text
 language plpgsql security definer set search_path = public as $fn$
-declare last timestamptz;
+declare last timestamptz; r text;
 begin
   select v into last from demo_meta where k = 'last_public_reset' for update;
   if last is not null and last > now() - interval '60 seconds' then
@@ -90,7 +90,10 @@ begin
   end if;
   insert into demo_meta(k, v) values ('last_public_reset', now())
     on conflict (k) do update set v = excluded.v;
-  return reset_demo();
+  r := reset_demo();
+  -- 重置會重建運輸商／車輛／司機（ID 會變），管理報表的歷史資料要跟著重產，不然報表會對不到名稱
+  if to_regprocedure('public.gen_report_history(integer)') is not null then perform gen_report_history(180); end if;
+  return r;
 end $fn$;
 revoke execute on function reset_demo_public() from public;
 grant execute on function reset_demo_public() to anon, authenticated;
